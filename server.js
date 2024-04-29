@@ -26,18 +26,23 @@ app.get('/login', (req, res) => {
   `);
 })
 
+authenticated = false
 app.use(express.urlencoded({ extended: true }));
 app.post('/login', (req, res) => {
   if (
     req.body.username === 'admin' &&
     req.body.password === 'admin') {
+    authenticated = true
     return res.redirect('/protectedRoute');
   }
   res.send('Access Denied');
 })
 
 app.get('/protectedRoute', (req, res) => {
-  res.send('Hello protected Route');
+  if (authenticated)
+    res.send('Hello protected Route');
+  else
+    res.status(401).send('Please login first');
 });
 
 app.listen(3000, () => {
