@@ -80,12 +80,15 @@ app.get('/anotherProtectedRoute', (req, res) => {
   res.send('Hello another protected Route');
 });
 
-
-app.get('/anotherProtectedRouteForAdminsOnly', (req, res) => {
+isAdmin = (req, res, next) => {
   if (req.session.type == 'administrator')
-    return res.send('anotherProtectedRouteForAdminsOnly');
+    next()
   else
     return res.status(401).send('Access Denied');
+}
+app.use(isAdmin) // this global middleware will be applied to all routes after this line
+app.get('/anotherProtectedRouteForAdminsOnly', (req, res) => {
+  return res.send('anotherProtectedRouteForAdminsOnly');
 });
 
 app.listen(3000, () => {
