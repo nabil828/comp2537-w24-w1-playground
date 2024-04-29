@@ -1,6 +1,13 @@
 const express = require('express');
 const app = express();
+var session = require('express-session')
 
+app.use(session({
+  secret: 'the sky is blue!', // a bad secret
+  resave: false,
+  saveUninitialized: true,
+  // cookie: { secure: true }
+}))
 
 app.get('/', (req, res) => {
   res.send('Hello World');
@@ -26,20 +33,20 @@ app.get('/login', (req, res) => {
   `);
 })
 
-authenticated = false
+
 app.use(express.urlencoded({ extended: true }));
 app.post('/login', (req, res) => {
   if (
     req.body.username === 'admin' &&
     req.body.password === 'admin') {
-    authenticated = true
+    req.session.authenticated = true
     return res.redirect('/protectedRoute');
   }
   res.send('Access Denied');
 })
 
 app.get('/protectedRoute', (req, res) => {
-  if (authenticated)
+  if (req.session.authenticated)
     res.send('Hello protected Route');
   else
     res.status(401).send('Please login first');
