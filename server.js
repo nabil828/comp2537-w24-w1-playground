@@ -64,29 +64,28 @@ app.post('/login', (req, res) => {
   res.send('Access Denied');
 })
 
-app.get('/protectedRoute', (req, res) => {
+isUserAuthenticated = (req, res, next) => {
   if (req.session.authenticated)
-    res.send('Hello protected Route');
+    next()
   else
     res.status(401).send('Please login first');
+}
+app.use(isUserAuthenticated) // this global middleware will be applied to all routes after this line
+
+app.get('/protectedRoute', (req, res) => {
+  res.send('Hello protected Route');
 });
 
 app.get('/anotherProtectedRoute', (req, res) => {
-  if (req.session.authenticated)
-    res.send('Hello protected Route');
-  else
-    res.status(401).send('Please login first');
+  res.send('Hello another protected Route');
 });
 
 
 app.get('/anotherProtectedRouteForAdminsOnly', (req, res) => {
-  if (req.session.authenticated)
-    if (req.session.type == 'administrator')       
-      return res.send('anotherProtectedRouteForAdminsOnly');
-    else 
-      return res.status(401).send('Access Denied');
-  res.status(401).send('Please login first');
-
+  if (req.session.type == 'administrator')
+    return res.send('anotherProtectedRouteForAdminsOnly');
+  else
+    return res.status(401).send('Access Denied');
 });
 
 app.listen(3000, () => {
