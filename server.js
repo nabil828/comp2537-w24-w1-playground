@@ -79,6 +79,9 @@ app.get('/protectedRoute', (req, res) => {
 app.get('/anotherProtectedRoute', (req, res) => {
   res.send('Hello another protected Route');
 });
+app.get('/anotherProtectedRoute2', (req, res) => {
+  res.send('Hello another protected Route2');
+});
 
 isAdmin = (req, res, next) => {
   if (req.session.type == 'administrator')
@@ -89,6 +92,10 @@ isAdmin = (req, res, next) => {
 app.use(isAdmin) // this global middleware will be applied to all routes after this line
 app.get('/anotherProtectedRouteForAdminsOnly', (req, res) => {
   return res.send('anotherProtectedRouteForAdminsOnly');
+});
+
+app.get('/anotherProtectedRouteForAdminsOnly2', (req, res) => {
+  return res.send('anotherProtectedRouteForAdminsOnly2');
 });
 
 app.listen(3000, () => {
