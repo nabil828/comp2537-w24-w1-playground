@@ -3,31 +3,39 @@ const app = express();
 var session = require('express-session');
 const { type } = require('os');
 
+
+
+const mongoose = require('mongoose');
+
+main().catch(err => console.log(err));
+
+async function main() {
+  await mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+}
+
+
+const usersSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  type: String
+});
+
+
+const userModel = mongoose.model('w1users', usersSchema);
+
+
+
 app.use(session({
   secret: 'the sky is blue!', // a bad secret
   resave: false,
   saveUninitialized: true,
   // cookie: { secure: true }
+  // TODO to replace the default memory session store with a database store
 }))
 
-// TODO to replace it with a database
-users = [
-  {
-    username: 'admin',
-    password: 'admin',
-    type: 'administrator'
-  },
-  {
-    username: 'user1',
-    password: 'pass1',
-    type: 'non-administrator'
-  },
-  {
-    username: 'user2',
-    password: 'pass2',
-    type: 'non-administrator'
-  }
-]
+
 
 app.get('/', (req, res) => {
   res.send('Hello World');
@@ -55,10 +63,15 @@ app.get('/login', (req, res) => {
 
 
 app.use(express.urlencoded({ extended: true }));
-app.post('/login', (req, res) => {
-  if (users.find((user) => user.username == req.body.username && user.password == req.body.password)) {
+app.post('/login', async (req, res) => {
+  result = await userModel.findOne({
+    username: req.body.username,
+    password: req.body.password
+  })
+
+  if (result) {
     req.session.authenticated = true
-    req.session.type = users.find((user) => user.username == req.body.username).type
+    req.session.type = result.type
     return res.redirect('/protectedRoute');
   }
   res.send('Access Denied');
