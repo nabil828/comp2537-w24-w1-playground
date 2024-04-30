@@ -1,7 +1,12 @@
 const express = require('express');
 const app = express();
 var session = require('express-session');
-const { type } = require('os');
+
+var MongoDBStore = require('connect-mongodb-session')(session);
+var store = new MongoDBStore({
+  uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
+  collection: 'mySessions'
+});
 
 
 
@@ -33,6 +38,7 @@ app.use(session({
   saveUninitialized: true,
   // cookie: { secure: true }
   // TODO to replace the default memory session store with a database store
+  store: store,
 }))
 
 
