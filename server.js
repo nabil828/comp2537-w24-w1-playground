@@ -8,7 +8,9 @@ var store = new MongoDBStore({
   collection: 'mySessions'
 });
 
+const ejs = require('ejs');
 
+app.set('view engine', 'ejs');
 
 const mongoose = require('mongoose');
 
@@ -78,6 +80,7 @@ app.post('/login', async (req, res) => {
   if (result) {
     req.session.authenticated = true
     req.session.type = result.type
+    req.session.username = result.username
     return res.redirect('/protectedRoute');
   }
   res.send('Access Denied');
@@ -92,11 +95,20 @@ isUserAuthenticated = (req, res, next) => {
 app.use(isUserAuthenticated) // this global middleware will be applied to all routes after this line
 
 app.get('/protectedRoute', (req, res) => {
-  res.send('Hello protected Route');
+  res.render(`protectedRoute.ejs`,
+    {
+      username: req.session.username,
+      type: req.session.type,
+      todos: ['Buy Milk', 'Buy Eggs', 'Pay Bills']
+    });
 });
 
 app.get('/anotherProtectedRoute', (req, res) => {
-  res.send('Hello another protected Route');
+  res.render(`anotherProtectedRoute.ejs`, {
+    username: req.session.username,
+    type: req.session.type,
+    todos: ['Buy Milk', 'Buy Eggs', 'Pay Bills']
+  });
 });
 app.get('/anotherProtectedRoute2', (req, res) => {
   res.send('Hello another protected Route2');

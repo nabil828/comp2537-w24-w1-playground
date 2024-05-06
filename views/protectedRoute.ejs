@@ -1,0 +1,18 @@
+<%- include(`header.ejs`,{x:1111}) %>
+
+  Hello <%= username %> protected Route.
+  Your type is <%= type %>.
+
+  <!-- Display a button to access the admin dashboard. show only to admins -->
+  <!-- Conditional rendering -->
+  <% if (type === 'administrator') { %>
+    <a href="/adminDashBoard">Admin Dashboard</a>
+  <% } %>
+
+  <ul>
+  <% for (let i =0 ; i < todos.length ; i++) {%>
+    <li> <%= todos[i]%>  </li>
+  <% } %>
+  </ul>
+
+<%- include(`footer.ejs`) %>
